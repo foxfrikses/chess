@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPoint>
+#include <tuple>
 #include "men.h"
 
 class Board : public QObject
@@ -12,6 +13,7 @@ public:
     explicit Board(bool turn = true, QObject *parent = nullptr);
 private:
     bool turn;
+    std::tuple<Men, QPoint, QPoint> lastMove{Men::None, {0,0}, {0,0}};
     Men **board;
 
 

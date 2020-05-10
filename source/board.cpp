@@ -11,9 +11,17 @@ Board::Board(bool t, QObject *parent) : QObject(parent), turn{t}{
 void Board::move(const QPoint& from, const QPoint &to){
     if (from == to)
         return;
+    if (board[from.x()][from.y()] == Men::None)
+        return;
+    if ((board[from.x()][from.y()] > Men::None && !turn)
+            || (board[from.x()][from.y()] < Men::None && turn))
+        return;
+
     board[to.x()][to.y()] = board[from.x()][from.y()];
     board[from.x()][from.y()] = Men::None;
-    emit moved((int *const *const)board);
+    turn = !turn;
+    lastMove = {board[to.x()][to.y()], from, to};
+    emit moved((int *const*const)board);
 }
 
 void Board::initBoard(){

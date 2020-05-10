@@ -1,5 +1,6 @@
 #include "chessboard.h"
 #include <QMouseEvent>
+#include <QCursor>
 
 ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - white
 {  
@@ -25,15 +26,21 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
 }
 
 void ChessBoard::mousePressEvent(QMouseEvent *event){
+    QPoint to{event->y()/cellSize, event->x()/cellSize};
     if (moveByClick){
-        QPoint to{event->y()/cellSize, event->x()/cellSize};
         if (movePoint != to){
             emit sendMove(movePoint, to);
         }
     }
     else{
-        movePoint.setX(event->y()/cellSize);
-        movePoint.setY(event->x()/cellSize);
+        if(to.x() < 8 && to.y() < 8 && matrix[to.x()][to.y()] != 0){
+            movePoint.setX(to.x());
+            movePoint.setY(to.y());
+            this->setCursor((QPixmap(getManPicPath(
+                            matrix[to.x()][to.y()])).scaled(cellSize, cellSize,
+                                                    Qt::KeepAspectRatio)));
+        }
+
     }
 }
 
@@ -43,15 +50,24 @@ void ChessBoard::mouseDoubleClickEvent(QMouseEvent *event){
 
 void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
     if (moveByClick){
+        this->setCursor(QCursor());
         moveByClick = false;
         return;
     }
     QPoint to{event->y()/cellSize, event->x()/cellSize};
     if (movePoint == to){
-        moveByClick = true;
+        if(to.x() < 8 && to.y() < 8 && matrix[to.x()][to.y()] != 0){
+            moveByClick = true;
+            this->setCursor((QPixmap(getManPicPath(
+                                     matrix[to.x()][to.y()])).scaled(cellSize,
+                                                  cellSize, Qt::KeepAspectRatio)));
+
+        }
     }
-    else
+    else{
         emit sendMove(movePoint, to);
+        this->setCursor(QCursor());
+    }
 }
 
 void ChessBoard::setBoard(int *const *const men){
