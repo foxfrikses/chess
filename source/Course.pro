@@ -27,11 +27,16 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         widget.cpp \
-    chessboard.cpp
+    chessboard.cpp \
+    board.cpp \
+    logic.cpp
 
 HEADERS += \
         widget.h \
-    chessboard.h
+    chessboard.h \
+    board.h \
+    men.h \
+    logic.h
 
 FORMS += \
     widget.ui

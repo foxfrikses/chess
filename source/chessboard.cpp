@@ -1,4 +1,5 @@
 #include "chessboard.h"
+#include <QMouseEvent>
 
 ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - white
 {  
@@ -16,14 +17,44 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
         for (int j = 0; j < nCells; ++j){
             cells[i][j].setParent(this);
             cells[i][j].setGeometry(j * cellSize, i * cellSize, cellSize, cellSize);
-            cells[i][j].setPixmap(QPixmap(getManPicPath(defMenPosition[i][j])));
+            //cells[i][j].setPixmap(QPixmap(getManPicPath(defMenPosition[i][j])));
         }
     }
 
-    //setBoard();
+    setBoard();
 }
 
-void ChessBoard::setBoard(int **men){
+void ChessBoard::mousePressEvent(QMouseEvent *event){
+    if (moveByClick){
+        QPoint to{event->y()/cellSize, event->x()/cellSize};
+        if (movePoint != to){
+            emit sendMove(movePoint, to);
+        }
+    }
+    else{
+        movePoint.setX(event->y()/cellSize);
+        movePoint.setY(event->x()/cellSize);
+    }
+}
+
+void ChessBoard::mouseDoubleClickEvent(QMouseEvent *event){
+    mousePressEvent(event);
+}
+
+void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
+    if (moveByClick){
+        moveByClick = false;
+        return;
+    }
+    QPoint to{event->y()/cellSize, event->x()/cellSize};
+    if (movePoint == to){
+        moveByClick = true;
+    }
+    else
+        emit sendMove(movePoint, to);
+}
+
+void ChessBoard::setBoard(int *const *const men){
     if (men){
         for (int i = 0; i < nCells; ++i)
             for (int j = 0; j < nCells; ++j)
@@ -34,7 +65,7 @@ void ChessBoard::setBoard(int **men){
                                                                                       Qt::KeepAspectRatio));
                 }
     } else
-        for (int i = 0; i < nCells; ++i)
+        for (int i = 0; i < nCells; ++i){
             for (int j = 0; j < nCells; ++j)
                 if (defMenPosition[i][j] != matrix[i][j]){
                     matrix[i][j] = defMenPosition[i][j];
@@ -42,13 +73,12 @@ void ChessBoard::setBoard(int **men){
                                                                                        cellSize,
                                                                                        Qt::KeepAspectRatio));
                 }
+        }
 }
 
 QString ChessBoard::getManPicPath(int m)
 {
     switch (m) {
-        case 0: default: return nullptr;
-
         case 1: return QString(":/img/img/pawn-white.png");
         case 2: return QString(":/img/img/knight-white.png");
         case 3: return QString(":/img/img/bishop-white.png");
@@ -62,5 +92,8 @@ QString ChessBoard::getManPicPath(int m)
         case -4: return QString(":/img/img/rook-black.png");
         case -5: return QString(":/img/img/queen-black.png");
         case -6: return QString(":/img/img/king-black.png");
+
+        case 0:
+        default: return nullptr;
     }
 }

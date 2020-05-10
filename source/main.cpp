@@ -1,11 +1,11 @@
-#include "widget.h"
 #include <QApplication>
+#include "logic.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Widget w;
-    w.show();
+    Logic l;
+    l.show();
 
     return a.exec();
 }
