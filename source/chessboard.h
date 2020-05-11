@@ -24,7 +24,7 @@ private:
 signals:
     void sendMove(const QPoint &from, const QPoint &to);
 public slots:
-    void setBoard(int *const *const men = nullptr);
+    void setBoard(int *const *const men = nullptr, int status = 0);
 
 public:
     QLabel **cells;

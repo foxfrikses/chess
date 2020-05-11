@@ -36,7 +36,8 @@ HEADERS += \
     chessboard.h \
     board.h \
     men.h \
-    logic.h
+    logic.h \
+    status.h
 
 FORMS += \
     widget.ui

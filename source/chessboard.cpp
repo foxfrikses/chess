@@ -70,7 +70,7 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
     }
 }
 
-void ChessBoard::setBoard(int *const *const men){
+void ChessBoard::setBoard(int *const *const men, int status){
     if (men){
         for (int i = 0; i < nCells; ++i)
             for (int j = 0; j < nCells; ++j)

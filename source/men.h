@@ -1,7 +1,7 @@
 #ifndef MEN_H
 #define MEN_H
 
-enum Men : int{
+enum Men : int{ // DONT CHANGE NUMBERS
     None    = 0,
 
     WPawn   = 1,
