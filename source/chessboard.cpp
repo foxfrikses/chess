@@ -6,7 +6,7 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
 {  
     this->setFixedSize(windowSize, windowSize);
     cells = new QLabel*[nCells];
-    for (auto i{0}; i < nCells; ++i)
+    for (auto i = 0; i < nCells; ++i)
         cells[i] = new QLabel[nCells];
     for (int i = 0; i < nCells; ++i){
         for (int j = (1 + i)%2 ; j < nCells; j += 2)
@@ -17,7 +17,7 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
     for (int i = 0; i < nCells; ++i){
         for (int j = 0; j < nCells; ++j){
             cells[i][j].setParent(this);
-            cells[i][j].setGeometry(j * cellSize, i * cellSize, cellSize, cellSize);
+            cells[i][j].setGeometry(i * cellSize, j * cellSize, cellSize, cellSize);
             //cells[i][j].setPixmap(QPixmap(getManPicPath(defMenPosition[i][j])));
         }
     }
@@ -26,7 +26,7 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
 }
 
 void ChessBoard::mousePressEvent(QMouseEvent *event){
-    QPoint to{event->y()/cellSize, event->x()/cellSize};
+    QPoint to{event->x()/cellSize, event->y()/cellSize};
     if (moveByClick){
         if (movePoint != to){
             emit sendMove(movePoint, to);
@@ -54,7 +54,7 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
         moveByClick = false;
         return;
     }
-    QPoint to{event->y()/cellSize, event->x()/cellSize};
+    QPoint to{event->x()/cellSize, event->y()/cellSize};
     if (movePoint == to){
         if(to.x() < 8 && to.y() < 8 && matrix[to.x()][to.y()] != 0){
             moveByClick = true;
@@ -72,20 +72,20 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
 
 void ChessBoard::setBoard(int *const *const men, int status){
     if (men){
-        for (int i = 0; i < nCells; ++i)
-            for (int j = 0; j < nCells; ++j)
-                if (men[i][j] != matrix[i][j]){
-                    matrix[i][j] = men[i][j];
-                    cells[i][j].setPixmap(QPixmap(getManPicPath(matrix[i][j])).scaled(cellSize,
+        for (int x = 0; x < nCells; ++x)
+            for (int y = 0; y < nCells; ++y)
+                if (men[x][y] != matrix[x][y]){
+                    matrix[x][y] = men[x][y];
+                    cells[x][y].setPixmap(QPixmap(getManPicPath(matrix[x][y])).scaled(cellSize,
                                                                                       cellSize,
                                                                                       Qt::KeepAspectRatio));
                 }
     } else
-        for (int i = 0; i < nCells; ++i){
-            for (int j = 0; j < nCells; ++j)
-                if (defMenPosition[i][j] != matrix[i][j]){
-                    matrix[i][j] = defMenPosition[i][j];
-                    cells[i][j].setPixmap(QPixmap(getManPicPath(matrix[i][j])).scaled(cellSize,
+        for (int x = 0; x < nCells; ++x){
+            for (int y = 0; y < nCells; ++y)
+                if (defMenPosition[x][y] != matrix[x][y]){
+                    matrix[x][y] = defMenPosition[x][y];
+                    cells[x][y].setPixmap(QPixmap(getManPicPath(matrix[x][y])).scaled(cellSize,
                                                                                        cellSize,
                                                                                        Qt::KeepAspectRatio));
                 }

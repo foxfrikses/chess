@@ -3,10 +3,13 @@
 
 #include <QObject>
 #include <QPoint>
+#include <QVector>
 #include <tuple>
 #include "men.h"
 #include "status.h"
 
+struct MoveStruct{Men moved; Men beated; QPoint from; QPoint to; QPoint beatedPoint;};
+struct Point{QPoint point; Men man;};
 
 class Board : public QObject
 {
@@ -32,9 +35,8 @@ private:
     
     QPoint WhiteKing;
     QPoint BlackKing;
-    std::tuple<Men, QPoint, QPoint, Men> lastMove{Men::None, {0,0}, {0,0}, Men::None};
-    std::tuple<Men, QPoint, QPoint, Men> tempMove{Men::None, {0,0}, {0,0}, Men::None};
-//    bool canMove(const QPoint &from, const QPoint &to);
+
+    bool canMove(const QPoint &from, const QPoint &to);
 //    bool canMovePawn(const QPoint &from, const QPoint &to);
 //    bool canMoveKnight(const QPoint &from, const QPoint &to);
 //    bool canMoveRook(const QPoint &from, const QPoint &to);
@@ -43,9 +45,10 @@ private:
 //    bool canMoveKing(const QPoint &from, const QPoint &to);
 //    bool canMove(const QPoint &from);
     
+    MoveStruct lastMove{Men::None, Men::None, {-1,-1}, {-1,-1}, {-1,-1}};
     Status status;
     bool hasCheck(bool isWhite);
-    bool nChecks(bool isWhite);
+    int nChecks(bool isWhite);
 //    bool hasMate(bool isWhite = true);
 //    bool hasStaleMate(bool isWhite = true);
 //    bool hasDraw(bool isWhite = true);
