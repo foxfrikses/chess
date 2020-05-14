@@ -18,23 +18,26 @@ public:
     explicit Board(bool turn = true, QObject *parent = nullptr);
 private:
     bool turn;
-    Men **fullBoard; // tu check checks he-he 12*12
+    Men **fullBoard; // to check checks he-he 12*12
     Men **board; // just a part of fullBoard 8*8
 
 
 signals:
     void moved(int *const *const board, int status);
-    void promotion();
+    void promotion(bool);
     void message(QString msg);
 public slots:
     void move(const QPoint& from, const QPoint &to);
-//    void promotion(int men);
+    void promotion(int);
     void initBoard();
 private:
     int N = 8;
+    bool prom{false};
     
     QPoint WhiteKing;
     QPoint BlackKing;
+    bool WKMoved;
+    bool BKMoved;
 
     bool canMove(const QPoint &from, const QPoint &to);
 //    bool canMovePawn(const QPoint &from, const QPoint &to);

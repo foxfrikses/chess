@@ -10,6 +10,10 @@ Widget::Widget(QWidget *parent) :
     auto geom = board->geometry();
     geom.setX(0); geom.setY(0);
     board->setGeometry(geom);
+    promDialog.setModal(true);
+    connect(this, SIGNAL(promotion(bool)), &promDialog, SLOT(execute(bool)));
+    connect(&promDialog, SIGNAL(sendResult(int)),  this, SIGNAL(promotion(int)));
+
 }
 
 Widget::~Widget()

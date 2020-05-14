@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "chessboard.h"
+#include "promotiondialog.h"
 
 namespace Ui {
 class Widget;
@@ -17,8 +18,12 @@ public:
 
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
+signals:
+    void promotion(bool);
+    void promotion(int);
 
 private:
+    PromotionDialog promDialog;
     Ui::Widget *ui;
 };
 

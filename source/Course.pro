@@ -29,7 +29,8 @@ SOURCES += \
         widget.cpp \
     chessboard.cpp \
     board.cpp \
-    logic.cpp
+    logic.cpp \
+    promotiondialog.cpp
 
 HEADERS += \
         widget.h \
@@ -37,10 +38,12 @@ HEADERS += \
     board.h \
     men.h \
     logic.h \
-    status.h
+    status.h \
+    promotiondialog.h
 
 FORMS += \
-    widget.ui
+    widget.ui \
+    promotiondialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
