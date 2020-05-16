@@ -70,7 +70,7 @@ void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
     }
 }
 
-void ChessBoard::setBoard(int *const *const men, int status){
+void ChessBoard::setBoard(int *const *const men, int status, bool turn){
     if (men){
         for (int x = 0; x < nCells; ++x)
             for (int y = 0; y < nCells; ++y)
@@ -90,6 +90,8 @@ void ChessBoard::setBoard(int *const *const men, int status){
                                                                                        Qt::KeepAspectRatio));
                 }
         }
+    emit sendStatus(status);
+    emit sendTurn(turn);
 }
 
 QString ChessBoard::getManPicPath(int m)

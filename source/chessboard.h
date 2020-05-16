@@ -22,9 +22,11 @@ private:
     QString getManPicPath(int m);
 
 signals:
+    void sendStatus(int);
+    void sendTurn(bool);
     void sendMove(const QPoint &from, const QPoint &to);
 public slots:
-    void setBoard(int *const *const men = nullptr, int status = 0);
+    void setBoard(int *const *const men = nullptr, int status = 0, bool turn = true);
 
 public:
     QLabel **cells;

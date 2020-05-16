@@ -21,7 +21,7 @@ private:
     Men **board; // just a part of fullBoard 8*8
 
 signals:
-    void moved(int *const *const board, int status);
+    void moved(int *const *const board, int status, bool turn);
     void promotion(bool);
     void message(QString msg);
 public slots:
@@ -32,7 +32,7 @@ private:
     struct MoveStruct{Men moved; Men beated; QPoint from; QPoint to; QPoint beatedPoint;};
     struct Point{QPoint point; Men man;};
 
-    int N = 8;
+    const int N = 8;
     bool prom{false};
     
     QPoint WhiteKing;
@@ -56,7 +56,7 @@ private:
     bool canBishopMove(const QPoint &from);
     bool canQueenMove(const QPoint &from);
     bool canKingMove(const QPoint &from);
-//    bool canMove(const QPoint &from);
+    bool canMove(const QPoint &from);
 
     bool canAchive(QPoint, bool);
     

@@ -71,8 +71,7 @@ void Board::move(const QPoint& from, const QPoint &to){
         board[from.x()][from.y()] = Men::None;
         checkStatus();
         turn = !turn;
-        emit moved((int*const*const)board, int(status));
-
+        emit moved((int*const*const)board, int(status), turn);
     }
 }
 
@@ -83,12 +82,15 @@ void Board::promotion(int man)
         board[lastMove.to.x()][lastMove.to.y()] = Men(man);
         checkStatus();
         turn = !turn;
-        emit moved((int*const*const)board, int(status));
+        emit moved((int*const*const)board, int(status), turn);
     }
 }
 
 void Board::initBoard(){
     turn = true;
+    prom = false;
+    lastMove = {Men::None, Men::None, {-1,-1}, {-1,-1}, {-1,-1}};
+    checkingMen = {-1,-1};
     status = Status::Play;
     WKMoved = false; BKMoved = false;
     for (int i = 0; i < N; ++i){
@@ -106,6 +108,7 @@ void Board::initBoard(){
     board[3][7] = Men::WQueen;
     board[4][0] = Men::BKing; BlackKing = {4, 0};
     board[4][7] = Men::WKing; WhiteKing = {4, 7};
+    emit moved((int*const*const)board, int(status), turn);
 }
 
 bool Board::canManMove(const QPoint &from, const QPoint &to){
@@ -308,65 +311,84 @@ bool Board::canKingMove(const QPoint &from, const QPoint &to){
     return result;
 }
 
-//bool Board::canPawnMove(const QPoint &from)
-//{
-
-//}
-
-//bool Board::canKnightMove(const QPoint &from)
-//{
-
-//}
-
-//bool Board::canRookMove(const QPoint &from)
-//{
-
-//}
-
-//bool Board::canBishopMove(const QPoint &from)
-//{
-
-//}
-
-//bool Board::canQueenMove(const QPoint &from)
-//{
-
-//}
-
-bool Board::canKingMove(const QPoint &from)
-{
-    QVector<QPoint> points;
-    bool t{from.y() > 0}, b{from.y() < 7}, l{from.x() > 0}, r{from.x() < 7};
-    if (t)   points.append({from.x(), from.y() - 1});
-    if (b)   points.append({from.x(), from.y() + 1});
-    if (l)   points.append({from.x() - 1, from.y()});
-    if (r)   points.append({from.x() + 1, from.y()});
-    if (t&r) points.append({from.x() + 1, from.y() - 1});
-    if (t&l) points.append({from.x() - 1, from.y() - 1});
-    if (b&r) points.append({from.x() + 1, from.y() + 1});
-    if (b&l) points.append({from.x() - 1, from.y() + 1});
-    for (auto p : points) {
-        Men temp = board[p.x()][p.y()];
-        board[p.x()][p.y()] = board[from.x()][from.y()];
-        board[from.x()][from.y()] = Men::None;
-        bool result = !hasCheck(board[p.x()][p.y()] > 0);
-        board[from.x()][from.y()] = board[p.x()][p.y()];
-        board[p.x()][p.y()] = temp;
-        if (result) return true;
-    }
+bool Board::canPawnMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x() + 1, from.y() + 1}, {from.x() - 1, from.y() + 1},
+                              {from.x() + 1, from.y() - 1}, {from.x() - 1, from.y() - 1},
+                              {from.x()    , from.y() + 2}, {from.x()    , from.y() - 2},
+                              {from.x()    , from.y() + 1}, {from.x()    , from.y() - 1}};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
     return false;
 }
 
-bool Board::canAchive(QPoint to, bool isWhite)
-{
+bool Board::canKnightMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x() + 1, from.y() + 2}, {from.x() - 1, from.y() - 2},
+                              {from.x() + 1, from.y() - 2}, {from.x() - 1, from.y() + 2},
+                              {from.x() + 2, from.y() + 1}, {from.x() - 2, from.y() - 1},
+                              {from.x() + 2, from.y() - 1}, {from.x() - 2, from.y() + 1}};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
+    return false;
+}
+
+bool Board::canRookMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x(),     from.y() + 1}, {from.x(),     from.y() - 1},
+                              {from.x() + 1, from.y()    }, {from.x() - 1, from.y()    }};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
+    return false;
+}
+
+bool Board::canBishopMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x() + 1, from.y() + 1}, {from.x() - 1, from.y() - 1},
+                              {from.x() + 1, from.y() - 1}, {from.x() - 1, from.y() + 1}};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
+    return false;
+}
+
+bool Board::canQueenMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x() + 1, from.y() + 1}, {from.x() - 1, from.y() - 1},
+                              {from.x() + 1, from.y() - 1}, {from.x() - 1, from.y() + 1},
+                              {from.x(),     from.y() + 1}, {from.x(),     from.y() - 1},
+                              {from.x() + 1, from.y()    }, {from.x() - 1, from.y()    }};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
+    return false;
+}
+
+bool Board::canKingMove(const QPoint &from){
+    QVector<QPoint> points = {{from.x() + 1, from.y() + 1}, {from.x() - 1, from.y() - 1},
+                              {from.x() + 1, from.y() - 1}, {from.x() - 1, from.y() + 1},
+                              {from.x(),     from.y() + 1}, {from.x(),     from.y() - 1},
+                              {from.x() + 1, from.y()    }, {from.x() - 1, from.y()    },
+                              {from.x() + 2, from.y()    }, {from.x() - 2, from.y()    }};
+    for (auto to : points)
+        if (canManMove(from, to)) return true;
+    return false;
+}
+
+bool Board::canMove(const QPoint &from){
+    switch(abs(board[from.x()][from.y()])){
+        case 1: return canPawnMove(from);
+        case 2: return canKnightMove(from);
+        case 3: return canBishopMove(from);
+        case 4: return canRookMove(from);
+        case 5: return canQueenMove(from);
+        case 6: return canKingMove(from);
+    default: return false;
+    }
+}
+
+bool Board::canAchive(QPoint to, bool isWhite){
     QVector<QPoint> points;
     int x = to.x();
     int y = to.y();
-    Men pawn    = (isWhite)? Men::WPawn : Men::BPawn;
-    Men knight  = (isWhite)? Men::WKnight : Men::BKnight;
-    Men queen   = (isWhite)? Men::WQueen : Men::BQueen;
-    Men rook    = (isWhite)? Men::WRook : Men::BRook;
-    Men bishop  = (isWhite)? Men::WBishop : Men::BBishop;
+    Men pawn    = (isWhite)? Men::BPawn   : Men::WPawn;
+    Men knight  = (isWhite)? Men::BKnight : Men::WKnight;
+    Men queen   = (isWhite)? Men::BQueen  : Men::WQueen;
+    Men rook    = (isWhite)? Men::BRook   : Men::WRook;
+    Men bishop  = (isWhite)? Men::BBishop : Men::WBishop;
 
     // Pawn
     if (board[x + 1][y + int(pawn)] == pawn) points.append({x + 1, y + int(pawn)});
@@ -431,8 +453,7 @@ bool Board::canAchive(QPoint to, bool isWhite)
     return result;
 }
 
-int Board::nChecks(bool isWhite)
-{
+int Board::nChecks(bool isWhite){
     int result = 0;
     int x = (isWhite)? WhiteKing.x() : BlackKing.x();
     int y = (isWhite)? WhiteKing.y() : BlackKing.y();
@@ -510,22 +531,28 @@ int Board::nChecks(bool isWhite)
 void Board::checkStatus()
 {
     int n = nChecks(!turn);
-    bool KMove = canKingMove((turn)? BlackKing: WhiteKing);
 
     if (n == 0){
-        if (KMove) status = Status::Play;
-        else{
-            // can move for each men
+        status = Status::StaleMate;
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N; ++j) {
+                if ((turn && board[i][j] < Men::None) || (!turn && board[i][j] > Men::None))
+                    if (canMove({i,j})){
+                        status = Status::Play;
+                        return;
+                    }
+            }
         }
     }
     else if (n == 1){
         status = Status::Check;
-        if (!KMove) {
-            Men man = board[checkingMen.x()][checkingMen.y()];
+        QPoint chManPoint = checkingMen;
+        if (!canMove(QPoint((turn)? BlackKing: WhiteKing))) {
+            Men man = board[chManPoint.x()][chManPoint.y()];
             QPoint kingPoint = (man > 0)? BlackKing : WhiteKing;
-            int kx{kingPoint.x()}, ky{kingPoint.y()}, mx{checkingMen.x()}, my{checkingMen.y()};
-            QPoint d = kingPoint - checkingMen;
-            if(!canAchive(checkingMen, man > 0)) status = Status::Mate;
+            int kx{kingPoint.x()}, ky{kingPoint.y()}, mx{chManPoint.x()}, my{chManPoint.y()};
+            QPoint d = kingPoint - chManPoint;
+            if(canAchive(chManPoint, man > 0)) return;
             if(abs(man) == 3 || abs(man) == 5) {
                 if (d.x() > 0 && d.y() > 0){
                     for (int ix = mx + 1, iy = my + 1; ix < kx; ++ix, ++iy)
@@ -554,15 +581,13 @@ void Board::checkStatus()
                     for (int iy = ky + 1; iy < my; ++iy)
                         if (canAchive({kx, iy}, man > 0)) return;
             }
+            status = Status::Mate;
         }
     }
     else if (n > 1){
-        if (KMove) status = Status::DoubleCheck;
+        if (canMove(QPoint((turn)? BlackKing: WhiteKing))) status = Status::DoubleCheck;
         else status = Status::Mate;
     }
 }
 
-bool Board::hasCheck(bool isWhite){
-    int n = nChecks(isWhite);
-    return n > 0;
-}
+bool Board::hasCheck(bool isWhite) {return nChecks(isWhite) > 0;}

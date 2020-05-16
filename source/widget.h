@@ -21,6 +21,10 @@ public:
 signals:
     void promotion(bool);
     void promotion(int);
+    void newGame();
+private slots:
+    void setStatus(int status);
+    void setTurn(bool turn);
 
 private:
     PromotionDialog promDialog;
