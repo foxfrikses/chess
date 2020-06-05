@@ -1,31 +1,29 @@
-#include "widget.h"
-#include "ui_widget.h"
+#include "replay_game_window.h"
+#include "ui_replay_game_window.h"
 #include "status.h"
+#include <QStringListModel>
+#include <QDebug>
 
-Widget::Widget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Widget)
+ReplayGameWindow::ReplayGameWindow(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::ReplayGameWindow)
 {
     ui->setupUi(this);
-    board = new ChessBoard(ui->chessboard_frame);
+    board = new BoardReplayWidget(ui->board_frame);
     auto geom = board->geometry();
     geom.setX(0); geom.setY(0);
     board->setGeometry(geom);
-    promDialog.setModal(true);
-    connect(this, SIGNAL(promotion(bool)), &promDialog, SLOT(execute(bool)));
-    connect(&promDialog, SIGNAL(sendResult(int)),  this, SIGNAL(promotion(int)));
     connect(board, SIGNAL(sendStatus(int)), this, SLOT(setStatus(int)));
     connect(board, SIGNAL(sendTurn(bool)),   this, SLOT(setTurn(bool)));
-    connect(ui->newgame, SIGNAL(clicked(bool)), this, SIGNAL(newGame()));
 }
 
-Widget::~Widget()
+ReplayGameWindow::~ReplayGameWindow()
 {
     delete ui;
     delete board;
 }
 
-void Widget::setStatus(int status){
+void ReplayGameWindow::setStatus(int status){
     switch (Status(status)) {
         case Status::Play:        ui->status->setText(QString("Play"));        break;
         case Status::Mate:        ui->status->setText(QString("Mate"));        break;
@@ -37,7 +35,25 @@ void Widget::setStatus(int status){
     }
 }
 
-void Widget::setTurn(bool turn){
+void ReplayGameWindow::setTurn(bool turn){
     if (turn) ui->turn->setText(QString("White"));
     else      ui->turn->setText(QString("Black"));
+}
+
+void ReplayGameWindow::on_exit_clicked()
+{
+    this->close();
+}
+
+void ReplayGameWindow::getMoves(QStringList moves)
+{
+    QStringListModel *model = new QStringListModel();
+    model->setStringList(moves);
+    ui->listView->setModel(model);
+}
+
+void ReplayGameWindow::on_listView_clicked(const QModelIndex &index)
+{
+    qDebug() << "INDEX: " << index.row();
+    emit selectedMove(index.row());
 }

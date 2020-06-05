@@ -1,9 +1,9 @@
-#include "chessboard.h"
+#include "board_replay_widget.h"
 #include <QMouseEvent>
 #include <QCursor>
 
-ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - white
-{  
+BoardReplayWidget::BoardReplayWidget(QWidget *parent) : QWidget(parent) // turn == true - white
+{
     this->setFixedSize(windowSize, windowSize);
     cells = new QLabel*[nCells];
     for (auto i = 0; i < nCells; ++i)
@@ -25,52 +25,8 @@ ChessBoard::ChessBoard(QWidget *parent) : QWidget(parent) // turn == true - whit
     setBoard();
 }
 
-void ChessBoard::mousePressEvent(QMouseEvent *event){
-    QPoint to{event->x()/cellSize, event->y()/cellSize};
-    if (moveByClick){
-        if (movePoint != to){
-            emit sendMove(movePoint, to);
-        }
-    }
-    else{
-        if(to.x() < 8 && to.y() < 8 && matrix[to.x()][to.y()] != 0){
-            movePoint.setX(to.x());
-            movePoint.setY(to.y());
-            this->setCursor((QPixmap(getManPicPath(
-                            matrix[to.x()][to.y()])).scaled(cellSize, cellSize,
-                                                    Qt::KeepAspectRatio)));
-        }
 
-    }
-}
-
-void ChessBoard::mouseDoubleClickEvent(QMouseEvent *event){
-    mousePressEvent(event);
-}
-
-void ChessBoard::mouseReleaseEvent(QMouseEvent *event){
-    if (moveByClick){
-        this->setCursor(QCursor());
-        moveByClick = false;
-        return;
-    }
-    QPoint to{event->x()/cellSize, event->y()/cellSize};
-    if (movePoint == to){
-        if(to.x() < 8 && to.y() < 8 && matrix[to.x()][to.y()] != 0){
-            moveByClick = true;
-            this->setCursor((QPixmap(getManPicPath(
-                                     matrix[to.x()][to.y()])).scaled(cellSize,
-                                                  cellSize, Qt::KeepAspectRatio)));
-
-        }
-    }
-    else{
-        emit sendMove(movePoint, to);
-        this->setCursor(QCursor());
-    }
-}
-
-void ChessBoard::setBoard(int *const *const men, int status, bool turn){
+void BoardReplayWidget::setBoard(int *const *const men, int status, bool turn){
     if (men){
         for (int x = 0; x < nCells; ++x)
             for (int y = 0; y < nCells; ++y)
@@ -94,7 +50,7 @@ void ChessBoard::setBoard(int *const *const men, int status, bool turn){
     emit sendTurn(turn);
 }
 
-QString ChessBoard::getManPicPath(int m)
+QString BoardReplayWidget::getManPicPath(int m)
 {
     switch (m) {
         case 1: return QString(":/img/img/pawn-white.png");

@@ -2,18 +2,22 @@
 #define LOGIC_H
 
 #include <QObject>
-#include "widget.h"
+#include "mainwindow.h"
 #include "board.h"
+#include "board_replay.h"
+#include "db_manager.h"
 
 class Logic : public QObject
 {
     Q_OBJECT
 
-    Board b;
-    Widget w;
+    Board bg;
+    BoardReplay br;
+    MainWindow mw;
+    DBManager db;
 public:
     explicit Logic(QObject *parent = nullptr);
-    void show(){w.show();}
+    void show(){mw.show();}
 signals:
 
 public slots:

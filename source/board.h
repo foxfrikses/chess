@@ -8,13 +8,19 @@
 #include "men.h"
 #include "status.h"
 
-
 class Board : public QObject
 {
     Q_OBJECT
 public:
     explicit Board(bool turn = true, QObject *parent = nullptr);
     ~Board();
+    struct Move{
+        int32_t cell_from;
+        int32_t cell_to;
+        int32_t cell_add1;
+        int32_t cell_add2;
+        int32_t status;
+    };
 private:
     bool turn;
     Men **fullBoard; // to check checks he-he 12*12
@@ -24,6 +30,7 @@ signals:
     void moved(int *const *const board, int status, bool turn);
     void promotion(bool);
     void message(QString msg);
+    void sendLastMove(const std::pair<QString, Move>& move);
 public slots:
     void move(const QPoint& from, const QPoint &to);
     void promotion(int);
@@ -32,7 +39,8 @@ private:
     struct MoveStruct{Men moved; Men beated; QPoint from; QPoint to; QPoint beatedPoint;};
     struct Point{QPoint point; Men man;};
 
-    const int N = 8;
+    static const int N = 8;
+    static const int mod = 13;
     bool prom{false};
     
     QPoint WhiteKing;
@@ -67,7 +75,7 @@ private:
     int nChecks(bool isWhite);
     void checkStatus();
     
-    
+    std::pair<QString, Move> movedMen;
 };
 
 #endif // BOARD_H

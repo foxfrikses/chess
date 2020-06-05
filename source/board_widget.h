@@ -5,7 +5,7 @@
 #include <QLabel>
 
 
-class ChessBoard : public QWidget
+class BoardWidget : public QWidget
 {
     Q_OBJECT
 
@@ -14,7 +14,7 @@ class ChessBoard : public QWidget
     int nCells = 8;
     int cellSize = 50;
 public:
-    explicit ChessBoard(QWidget *parent = nullptr);
+    explicit BoardWidget(QWidget *parent = nullptr);
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
