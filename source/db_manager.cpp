@@ -38,6 +38,17 @@ void DBManager::store(QString name)
     if (!db.open()) return;
     QSqlQuery query(db);
 
+    query.prepare("SELECT ID FROM game WHERE name = ?" );
+    query.bindValue( 0, name);
+    query.exec();
+    int n = 0;
+    while (query.next())
+        ++n;
+    if (n != 0){
+        emit storeError("This name is already used");
+        return;
+    }
+
     query.prepare("INSERT INTO game (name) "
                   "VALUES (:name)");
     query.bindValue(":name", name);
@@ -51,8 +62,7 @@ void DBManager::store(QString name)
             query.prepare("INSERT INTO move (gameID, text, num_move, cell_from, cell_to, cell_add1, cell_add2, status) "
                           "VALUES (:gameID, :text, :num_move, :cell_from, :cell_to, :cell_add1, :cell_add2, :status)");
             query.bindValue(":gameID", gameID);
-//            query.bindValue(":text", moves[i].first);
-            query.bindValue(":text", QString::number(i+1));
+            query.bindValue(":text", QString::number(int((i+2)/2)) + ((i%2)?"... ":".   ") + moves[i].first);
             query.bindValue(":num_move", qint32(i + 1));
             query.bindValue(":cell_from", moves[i].second.cell_from);
             query.bindValue(":cell_to",   moves[i].second.cell_to);

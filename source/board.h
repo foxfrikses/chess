@@ -76,6 +76,9 @@ private:
     void checkStatus();
     
     std::pair<QString, Move> movedMen;
+private:
+    QString menToStr(Men);
+    QString statusToStr(Status);
 };
 
 #endif // BOARD_H

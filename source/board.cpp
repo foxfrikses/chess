@@ -35,12 +35,20 @@ void Board::move(const QPoint& from, const QPoint &to){
     movedMen.second.cell_to  = to.x() + mod*(to.y() + mod*(6 + board[to.x()][to.y()] + mod*(6 + board[from.x()][from.y()])));
     movedMen.second.cell_add1 = 0; // from_x + 13 * from_y + 13*13 * was_man + 13*13*13 * become_men
     movedMen.second.cell_add2 = 0;
+    movedMen.first = menToStr(board[from.x()][from.y()]);
+    movedMen.first += QString(char('a' + from.x())) + QString(char('8' - from.y()));
+    if (board[to.x()][to.y()] != Men::None)
+        movedMen.first += "x";
+    else {
+        movedMen.first += "-";
+    }
+    movedMen.first += QString(char('a' + to.x())) + QString(char('8' - to.y()));
 
     if(canMoveInTurn(from, to)){
         lastMove = {board[from.x()][from.y()], board[to.x()][to.y()], from, to, to};
         if (abs(board[from.x()][from.y()]) == Men::WPawn){
             if(abs(from.x() - to.x()) == 1 && board[to.x()][to.y()] == Men::None){
-                movedMen.first = QString();
+                movedMen.first += "e.p.";
                 movedMen.second.cell_add1 = to.x() + mod*(from.y() + mod*(6 + board[to.x()][from.y()] + mod*6));
                 lastMove.beated = board[to.x()][from.y()];
                 lastMove.beatedPoint = {to.x(),from.y()};
@@ -58,12 +66,15 @@ void Board::move(const QPoint& from, const QPoint &to){
         } else if (abs(board[from.x()][from.y()]) == Men::WKing){
             if(abs(from.x() - to.x()) > 1){
                 if(to.x() == 6){
-                    movedMen.first = QString();
+                    movedMen.first = QString("0-0");
                     movedMen.second.cell_add1 = 7 + mod*(to.y() + mod*(6 + board[7][to.y()] + mod*6));
                     movedMen.second.cell_add2 = 5 + mod*(to.y() + mod*(6 + mod*(6 + board[7][to.y()])));
                     board[5][to.y()] = board[7][to.y()];
                     board[7][to.y()] = Men::None;
                 }else if(to.x() == 2){
+                    movedMen.first = QString("0-0-0");
+                    movedMen.second.cell_add1 = 0 + mod*(to.y() + mod*(6 + board[7][to.y()] + mod*6));
+                    movedMen.second.cell_add2 = 3 + mod*(to.y() + mod*(6 + mod*(6 + board[7][to.y()])));
                     board[3][to.y()] = board[0][to.y()];
                     board[0][to.y()] = Men::None;
                 }else throw "Всё хуйня, давай по новой";
@@ -83,6 +94,7 @@ void Board::move(const QPoint& from, const QPoint &to){
         checkStatus();
         turn = !turn;
         movedMen.second.status = status;
+        movedMen.first += statusToStr(status);
         emit moved((int*const*const)board, int(status), turn);
         emit sendLastMove(movedMen);
     }
@@ -98,6 +110,8 @@ void Board::promotion(int man)
 
         movedMen.second.cell_to = movedMen.second.cell_to % (mod*mod) + (mod*mod*mod)*(man + 6);
         movedMen.second.status = status;
+        movedMen.first += "=" + menToStr(Men(man));
+        movedMen.first += statusToStr(status);
         emit moved((int*const*const)board, int(status), turn);
         emit sendLastMove(movedMen);
     }
@@ -604,6 +618,30 @@ void Board::checkStatus()
     else if (n > 1){
         if (canMove(QPoint((turn)? BlackKing: WhiteKing))) status = Status::DoubleCheck;
         else status = Status::Mate;
+    }
+}
+
+QString Board::menToStr(Men men)
+{
+    switch (abs(int(men))) {
+        case 1: return "P";
+        case 2: return "N";
+        case 3: return "B";
+        case 4: return "R";
+        case 5: return "Q";
+        case 6: return "K";
+    default: return "";
+    }
+}
+
+QString Board::statusToStr(Status status)
+{
+    switch (status) {
+        case Status::Mate: return "#";
+        case Status::Draw: case Status::StaleMate: return "=";
+        case Status::Check: return "+";
+        case Status::DoubleCheck: return "++";
+    default: return "";
     }
 }
 
