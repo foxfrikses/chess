@@ -16,8 +16,8 @@ public:
     explicit ReplayListGamesWindow(QWidget *parent = nullptr);
     ~ReplayListGamesWindow();
 
-private slots:
-    void on_load_games_button_clicked();
+    void load();
+
 
 private:
     Ui::ReplayListGamesWindow *ui;
@@ -29,6 +29,8 @@ private slots:
     void getGames(QStringList games);
 
     void on_gamesList_clicked(const QModelIndex &index);
+
+    void on_exit_button_clicked();
 
 public:
     ReplayGameWindow rgw;

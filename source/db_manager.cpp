@@ -9,10 +9,10 @@
 DBManager::DBManager(QObject *parent): QObject (parent)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
-//    QDir databasePath;
-//    QString path = databasePath.currentPath()+"moves.db";
-//    db.setDatabaseName(path);
-    db.setDatabaseName(QString("/home/artsiom/qtproj/g/chess/source/") + "moves.db");
+    QDir databasePath;
+    QString path = databasePath.currentPath()+"moves.db";
+    db.setDatabaseName(path);
+//    db.setDatabaseName(QString("/home/artsiom/qtproj/g/chess/source/") + "moves.db");
 
     if (!db.open()) return;
 

@@ -19,6 +19,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_replay_clicked()
 {
     this->hide();
+    rlgw.load();
     rlgw.exec();
     this->show();
 }

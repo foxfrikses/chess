@@ -16,10 +16,12 @@ ReplayListGamesWindow::~ReplayListGamesWindow()
     delete ui;
 }
 
-void ReplayListGamesWindow::on_load_games_button_clicked()
+void ReplayListGamesWindow::load()
 {
     emit loadGames();
 }
+
+
 
 void ReplayListGamesWindow::getGames(QStringList games)
 {
@@ -34,5 +36,10 @@ void ReplayListGamesWindow::on_gamesList_clicked(const QModelIndex &index)
     emit loadGame(index.data(Qt::DisplayRole).toString());
     this->hide();
     rgw.exec();
+    this->close();
+}
+
+void ReplayListGamesWindow::on_exit_button_clicked()
+{
     this->close();
 }

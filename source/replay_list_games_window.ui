@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -48,14 +48,14 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="load_games_button">
+     <widget class="QPushButton" name="exit_button">
       <property name="font">
        <font>
         <pointsize>12</pointsize>
        </font>
       </property>
       <property name="text">
-       <string>Load</string>
+       <string>Exit</string>
       </property>
      </widget>
     </item>
